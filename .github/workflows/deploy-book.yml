@@ -1,0 +1,49 @@
+name: Build and deploy book
+
+# master に push すると ligarb で本をビルドし、GitHub Pages に公開する。
+# Pages は configure-pages の enablement: true で自動有効化されるため事前設定は不要。
+# 手動で設定する場合は Settings > Pages > Source を "GitHub Actions" にする。
+
+on:
+  push:
+    branches: [master]   # main を使う場合はここを main に変更する
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+      # Gemfile で ligarb をピン留めしている場合は bundle 経由に置き換えてよい。
+      - name: Install ligarb
+        run: gem install ligarb
+      - name: Build book
+        run: ligarb build   # build/index.html を生成
+      - uses: actions/configure-pages@v5
+        with:
+          # Pages が未設定でもワークフロー側で有効化する（初回 push のレースを防ぐ）。
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

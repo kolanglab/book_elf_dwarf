@@ -1,0 +1,25 @@
+name: Build check
+
+# PR で ligarb build が通るかを検証する。Claude は関与しない。
+# このチェックを Settings > Branches の必須チェックに指定すると、
+# ビルドが落ちる PR を merge できなくできる。
+
+on:
+  pull_request:
+    branches: [master]   # main を使う場合はここを main に変更する
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+      - name: Install ligarb
+        run: gem install ligarb
+      - name: Build book
+        run: ligarb build   # 失敗すればチェックが落ちる

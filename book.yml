@@ -1,0 +1,38 @@
+title: "ELF/DWARF 入門"
+author: "ligarb AI"
+language: "ja"
+ai_generated: true
+bibliography: references.bib
+chapters:
+  - cover: cover.md
+  - introduction.md
+  - part: part-elf.md
+    chapters:
+      - elf-overview.md
+      - elf-header.md
+      - elf-sections.md
+      - elf-symbols.md
+      - elf-loading.md
+      - elf-beyond.md
+  - part: part-dwarf.md
+    chapters:
+      - dwarf-overview.md
+      - dwarf-dies.md
+      - dwarf-data.md
+      - dwarf-line.md
+      - dwarf-limits.md
+      - dwarf-beyond.md
+  - part: part-handson.md
+    chapters:
+      - handson-elf.md
+      - handson-dwarf.md
+  - appendix:
+    - tools.md
+    - glossary.md
+
+repository: "https://github.com/kolanglab/book_elf_dwarf"
+
+site_url: "https://kolanglab.github.io/book_elf_dwarf/"
+
+github_review:
+  enabled: true

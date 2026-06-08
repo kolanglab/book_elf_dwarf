@@ -1,0 +1,33 @@
+name: 本へのフィードバック
+description: 本文の誤り・わかりにくい点・疑問を報告する
+title: "[feedback] "
+labels: ["feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        本を読んで気づいた点を報告してください。
+        （ligarb の公開ページから「Report as issue」で来た場合、いくつかの項目は自動入力されています。）
+  - type: input
+    id: location
+    attributes:
+      label: 対象箇所
+      description: 章・節、ソースの Markdown ファイル名、公開サイトの該当 URL など
+      placeholder: "例: 第3章 2節 / 03-advanced.md / https://kolanglab.github.io/book_elf_dwarf/#ch3-2"
+    validations:
+      required: true
+  - type: textarea
+    id: quote
+    attributes:
+      label: 引用テキスト
+      description: 問題の箇所を本文から引用してください
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: 詳細
+      description: 気づいた点を自由に書いてください（誤り・わかりにくい点・疑問など、何でも）。種類の分類は不要です。対応の要否は内容を読んで判断します。
+    validations:
+      required: true
