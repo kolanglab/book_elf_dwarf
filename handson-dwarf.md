@@ -161,7 +161,7 @@ int main(int argc, char **argv) {
 
 ## 動かして確かめる
 
-第 11 章で `readelf --debug-dump=decodedline` が示した表を思い出してください。`sample` では、行 3 が 0x401136、行 5 が 0x40114f、行 9 が 0x401160、行 10 が 0x401172 から始まっていました。私たちのツールが同じ答えを出すか、確かめます。
+本物の `readelf --debug-dump=decodedline sample` が示す行番号表では、行 3 が 0x401136、行 5 が 0x40114f、行 9 が 0x401160、行 10 が 0x401172 から始まります。私たちのツールが同じ答えを出すか、確かめます。
 
 ```
 $ gcc -Wall -Wextra -o miniaddr2line miniaddr2line.c

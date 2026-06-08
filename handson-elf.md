@@ -111,7 +111,7 @@ ELF ヘッダから `e_shoff` と `e_shnum` が分かったので、第 4 章で
 
 ## 動かして確かめる
 
-コンパイルして、適当な実行ファイルに対して動かしてみましょう。ここでは、第 11 章でも使った小さな `sample`（`gcc -g -gdwarf-5 -O0 -no-pie -o sample sample.c` でビルドしたもの）を対象にします。
+コンパイルして、適当な実行ファイルに対して動かしてみましょう。ここでは、小さな `sample`（`gcc -g -gdwarf-5 -O0 -no-pie -o sample sample.c` でビルドしたもの）を対象にします。
 
 ```
 $ gcc -Wall -Wextra -o minireadelf minireadelf.c
