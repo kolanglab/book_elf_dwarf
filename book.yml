@@ -1,4 +1,5 @@
 title: "ELF/DWARF 入門"
+description: "実行ファイル形式 ELF とデバッグ情報形式 DWARF を、ヘッダ・セクション・シンボルから行番号情報・限界まで仕様に踏み込み、自作ツールのハンズオンも交えて解説"
 author: "ligarb AI"
 language: "ja"
 ai_generated: true
