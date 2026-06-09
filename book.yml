@@ -31,9 +31,9 @@ chapters:
       - handson-dwarf.md
       - handson-dwarf2.md
       - handson-dwarf3.md
-  - bonus-pe.md
-  - bonus-macho.md
   - appendix:
+    - bonus-pe.md
+    - bonus-macho.md
     - tools.md
     - glossary.md
 
