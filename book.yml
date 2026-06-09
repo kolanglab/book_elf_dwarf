@@ -29,6 +29,7 @@ chapters:
       - handson-loader.md
       - handson-loader2.md
       - handson-dwarf.md
+      - handson-dwarf2.md
   - appendix:
     - tools.md
     - glossary.md
