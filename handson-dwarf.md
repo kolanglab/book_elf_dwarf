@@ -6,7 +6,7 @@
 
 第 11 章で見たとおり、`.debug_line` には「アドレス → 行」の表そのものではなく、その表を生成する**バイトコード**が入っています。したがって私たちがやるべきことは、
 
-1. `.debug_line` セクションを取り出す（前章の `read_section` を再利用）。
+1. `.debug_line` セクションを取り出す（前章のセクション読み取りを `read_section` という関数にまとめて使う）。
 2. 各コンパイル単位（CU）のヘッダを読み、状態機械のパラメータ（`line_base`・`line_range` など）を得る。
 3. バイトコードを 1 命令ずつ実行し、行が出力されるたびに `(アドレス, 行)` の組を得る。
 4. 問い合わせアドレス以下で最大のアドレスを持つ行を選び、それが答えの行番号。
@@ -42,6 +42,44 @@ static uint32_t u32(uint8_t *p) { uint32_t v; memcpy(&v, p, 4); return v; }
 static uint16_t u16(uint8_t *p) { uint16_t v; memcpy(&v, p, 2); return v; }
 static uint64_t u64(uint8_t *p) { uint64_t v; memcpy(&v, p, 8); return v; }
 ```
+
+## 部品: セクションを名前で取り出す
+
+前章のミニ readelf では、セクションヘッダ表を読み、`.shstrtab` で名前を解決し、目的のセクションの本体を読む処理を `main` の中に直接書いていました。今回は `.debug_line` を取り出すのに同じ処理が必要なので、これを **セクション名を渡すとその本体を返す関数** `read_section` として括り出します。やっていることは前章とまったく同じ ―― 名前で探して `sh_offset`/`sh_size` から読むだけ ―― で、`must_read`（前章で作った `fread` の確認付きヘルパ）もそのまま使います。
+
+```c
+/* 名前でセクションを探し、その本体を malloc して返す（前章の処理を関数化）。
+   見つからなければ NULL を返し、*size に本体のバイト数を書き込む。 */
+static uint8_t *read_section(FILE *fp, const char *name,
+                             const Elf64_Ehdr *eh, uint64_t *size) {
+    /* セクションヘッダ表をまるごと読む */
+    Elf64_Shdr *sh = malloc((size_t)eh->e_shnum * sizeof *sh);
+    fseek(fp, (long)eh->e_shoff, SEEK_SET);
+    must_read(sh, sizeof *sh, eh->e_shnum, fp);
+
+    /* セクション名の文字列表 .shstrtab を読む */
+    Elf64_Shdr *shstr = &sh[eh->e_shstrndx];
+    char *names = malloc(shstr->sh_size);
+    fseek(fp, (long)shstr->sh_offset, SEEK_SET);
+    must_read(names, 1, shstr->sh_size, fp);
+
+    /* 名前が一致するセクションの本体を読んで返す */
+    uint8_t *body = NULL;
+    for (unsigned i = 0; i < eh->e_shnum; i++) {
+        if (strcmp(&names[sh[i].sh_name], name) == 0) {
+            body = malloc(sh[i].sh_size);
+            fseek(fp, (long)sh[i].sh_offset, SEEK_SET);
+            must_read(body, 1, sh[i].sh_size, fp);
+            *size = sh[i].sh_size;
+            break;
+        }
+    }
+    free(names); free(sh);
+    return body;
+}
+```
+
+前章で `.shstrtab` を読んで名前を解決した手順を、そっくりそのまま関数にしただけです。`main` から `read_section(fp, ".debug_line", &eh, &sz)` と呼べば、`.debug_line` の本体と長さが得られます。
 
 ## 行番号ヘッダを読む
 
@@ -129,7 +167,7 @@ static uint64_t u64(uint8_t *p) { uint64_t v; memcpy(&v, p, 8); return v; }
 
 ## main で組み立てる
 
-残りは、ファイルを開き、`.debug_line` を取り出し（前章の `read_section` を再利用）、上のループを回して結果を表示するだけです。
+残りは、ファイルを開き、`.debug_line` を取り出し（先ほど用意した `read_section` を使う）、上のループを回して結果を表示するだけです。
 
 ```c
 int main(int argc, char **argv) {
@@ -156,8 +194,6 @@ int main(int argc, char **argv) {
     return 0;
 }
 ```
-
-`read_section` は、前章のミニ readelf で書いたものを、指定した名前のセクションを返すように一般化したものです（セクション名を `.shstrtab` で解決し、目的のセクションの `sh_offset`/`sh_size` から本体を読む、という処理は同じです）。
 
 ## 動かして確かめる
 
