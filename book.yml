@@ -26,6 +26,7 @@ chapters:
   - part: part-handson.md
     chapters:
       - handson-elf.md
+      - handson-loader.md
       - handson-dwarf.md
   - appendix:
     - tools.md
