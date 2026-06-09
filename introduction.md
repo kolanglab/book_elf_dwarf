@@ -52,6 +52,28 @@ graph LR
 > [!TIP]
 > もしあなたが「デバッガを作りたい」「クラッシュレポートのスタックトレースを自前で解釈したい」「プロファイラを書きたい」といった目標を持っているなら、ELF だけでは足りず、必ず DWARF まで必要になります。逆に「リンカやローダの仕組みを知りたい」だけなら、ELF 部だけでも大きな収穫があるでしょう。
 
+## ELF と DWARF はどこで使われているのか
+
+「ELF と DWARF は Windows 以外では全部これなの？」 ―― よくある疑問です。答えは「だいたいそうだが、正確には少し違う」。実行ファイルの**容れ物**とデバッグ情報の**中身**を分けて見ると、きれいに整理できます。
+
+まず**実行ファイル形式（容れ物）**は、世の中に大きく 3 系統あります。
+
+- **ELF** ―― Unix 系の標準。System V ABI 由来で、**Linux・各種 BSD（FreeBSD/OpenBSD/NetBSD）・Solaris/illumos・Android**、そして多くの組込み／RTOS のツールチェインが使います。Unix 系の「共通通貨」です。
+- **Mach-O** ―― **Apple**（macOS・iOS・watchOS・tvOS）の形式。NeXTSTEP 由来で、ELF とは別物です。**ここが「Unix なのに ELF でない」最大の例外**です。
+- **PE（Portable Executable）** ―― **Windows**。`.exe`・DLL のほか、UEFI ファームウェアや .NET アセンブリの容れ物でもあります（[](bonus-pe.md)で扱います）。
+
+つまり ELF は「Windows 以外全部」ではなく、正確には「**Unix 系の大半。ただし Apple は Mach-O**」です。
+
+ところが**デバッグ情報（中身）**を見ると、話が変わります。**DWARF は ELF 専用ではありません**。Apple の Mach-O も、デバッグ情報は **DWARF** を使うのです（`.dSYM` バンドルに収めます）。だから DWARF は、Linux・BSD・Android に加えて **Apple まで**カバーする、Unix 世界の事実上の共通デバッグ形式になっています。これに対し、Windows だけは独自の **PDB（CodeView）** を使います。乱暴にまとめれば、「**DWARF が通じない主要 OS は、実質 Windows くらい**」というわけです。
+
+| 系統 | 実行ファイル形式 | デバッグ情報形式 |
+|---|---|---|
+| Linux・各種 BSD・Solaris・Android など Unix 系 | ELF | DWARF |
+| Apple（macOS・iOS …） | Mach-O | DWARF（`.dSYM` に格納） |
+| Windows | PE | PDB（CodeView） |
+
+整理すると ―― **ELF を学べば Unix 系の実行ファイルが読め、DWARF を学べば Apple まで含めてデバッグ情報が読める**。容れ物が違っても（ELF でも Mach-O でも）DWARF の読み方はそのまま通用するので、本書で身につける力の射程は、Linux 1 つにとどまりません。例外側の Windows（PE と PDB）については、巻末の[](bonus-pe.md)で「ELF の言葉で」覗いてみます。
+
 ## 本書で扱う範囲と前提
 
 ELF も DWARF も、仕様書はそれぞれ数百ページにわたる大部です。本書はそのすべてを網羅しません。代わりに、**実務やツール開発で実際によく使われる部分**に絞り、そこを具体的なバイト単位の記述まで掘り下げる方針を取ります。網羅性よりも「読んで切り分けられるようになる」ことを優先します。
