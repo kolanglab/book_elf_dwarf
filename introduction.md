@@ -59,7 +59,7 @@ graph LR
 まず**実行ファイル形式（容れ物）**は、世の中に大きく 3 系統あります。
 
 - **ELF** ―― Unix 系の標準。System V ABI 由来で、**Linux・各種 BSD（FreeBSD/OpenBSD/NetBSD）・Solaris/illumos・Android**、そして多くの組込み／RTOS のツールチェインが使います。Unix 系の「共通通貨」です。
-- **Mach-O** ―― **Apple**（macOS・iOS・watchOS・tvOS）の形式。NeXTSTEP 由来で、ELF とは別物です。**ここが「Unix なのに ELF でない」最大の例外**です。
+- **Mach-O** ―― **Apple**（macOS・iOS・watchOS・tvOS）の形式。NeXTSTEP 由来で、ELF とは別物です。**ここが「Unix なのに ELF でない」最大の例外**です（[](bonus-macho.md)で扱います）。
 - **PE（Portable Executable）** ―― **Windows**。`.exe`・DLL のほか、UEFI ファームウェアや .NET アセンブリの容れ物でもあります（[](bonus-pe.md)で扱います）。
 
 つまり ELF は「Windows 以外全部」ではなく、正確には「**Unix 系の大半。ただし Apple は Mach-O**」です。
@@ -72,7 +72,7 @@ graph LR
 | Apple（macOS・iOS …） | Mach-O | DWARF（`.dSYM` に格納） |
 | Windows | PE | PDB（CodeView） |
 
-整理すると ―― **ELF を学べば Unix 系の実行ファイルが読め、DWARF を学べば Apple まで含めてデバッグ情報が読める**。容れ物が違っても（ELF でも Mach-O でも）DWARF の読み方はそのまま通用するので、本書で身につける力の射程は、Linux 1 つにとどまりません。例外側の Windows（PE と PDB）については、巻末の[](bonus-pe.md)で「ELF の言葉で」覗いてみます。
+整理すると ―― **ELF を学べば Unix 系の実行ファイルが読め、DWARF を学べば Apple まで含めてデバッグ情報が読める**。容れ物が違っても（ELF でも Mach-O でも）DWARF の読み方はそのまま通用するので、本書で身につける力の射程は、Linux 1 つにとどまりません。例外側の Windows（PE と PDB）と Apple（Mach-O）については、巻末のおまけ ―― [](bonus-pe.md)と[](bonus-macho.md) ―― で「ELF の言葉で」覗いてみます。
 
 ## 本書で扱う範囲と前提
 
